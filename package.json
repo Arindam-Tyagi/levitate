@@ -1,0 +1,19 @@
+{
+  "name": "levitate-fullstack",
+  "version": "1.0.0",
+  "description": "Full-stack Levitate Data Management Dashboard",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd levitate-backend && npm run dev",
+    "dev:frontend": "cd levitate && npm run dev",
+    "install:all": "npm install && cd levitate && npm install && cd ../levitate-backend && npm install",
+    "build": "cd levitate && npm run build",
+    "start": "cd levitate-backend && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "keywords": ["data-management", "dashboard", "fullstack"],
+  "author": "",
+  "license": "ISC"
+} 
