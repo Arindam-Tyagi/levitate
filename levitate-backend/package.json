@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
+    "dev": "nodemon -r dotenv/config server.js",
     "dev:full": "concurrently \"npm run dev\" \"cd ../levitate && npm run dev\""
   },
   "keywords": [],

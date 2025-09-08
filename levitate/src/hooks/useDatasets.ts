@@ -32,20 +32,24 @@ export const useDatasets = () => {
     setActiveDataset(dataset);
   }, []);
 
+  
   const updateDataset = useCallback((id: string, updatedDataset: Dataset) => {
-    setDatasets(prev => prev.map(d => d.id === id ? updatedDataset : d));
-    if (activeDataset?.id === id) {
+    // Look for d._id instead of d.id
+    setDatasets(prev => prev.map(d => d._id === id ? updatedDataset : d)); 
+    if (activeDataset?._id === id) { // Check activeDataset?._id
       setActiveDataset(updatedDataset);
     }
-  }, [activeDataset?.id]);
+  }, [activeDataset?._id]); // Update dependency to activeDataset?._id
 
   const removeDataset = useCallback((id: string) => {
-    const remaining = datasets.filter(d => d.id !== id);
+    // Filter by d._id instead of d.id
+    const remaining = datasets.filter(d => d._id !== id); 
     setDatasets(remaining);
-    if (activeDataset?.id === id) {
+    if (activeDataset?._id === id) { // Check activeDataset?._id
       setActiveDataset(remaining[0] || null);
     }
-  }, [activeDataset?.id, datasets]);
+  }, [activeDataset?._id, datasets]); // Update dependency to activeDataset?._id
+
 
   return {
     datasets,

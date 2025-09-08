@@ -2,55 +2,41 @@ import React, { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { useDatasets } from '../hooks/useDatasets';
-import { Brain, TrendingUp, AlertCircle, Lightbulb, RefreshCw } from 'lucide-react';
-import { API_ENDPOINTS } from '../config/api'; // Import API_ENDPOINTS
+import { Brain, Lightbulb, RefreshCw, TrendingUp, AlertCircle } from 'lucide-react';
+import { API_ENDPOINTS } from '../config/api';
 
 export const AIInsights: React.FC = () => {
   const { activeDataset } = useDatasets();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [insights, setInsights] = useState<string | null>(null);
+  const [insight, setInsight] = useState<string | null>(null); // State for the insight string
 
-  const generateInsights = async () => { // Make function async
+  const generateInsights = async () => {
     if (!activeDataset) return;
 
-
     setIsGenerating(true);
+    setInsight(null); // Clear previous insight
     
-    // Simulate AI processing
-    setTimeout(() => {
-      const mockInsights = [
-        {
-          type: 'trend',
-          title: 'Revenue Growth Pattern',
-          description: 'Your revenue shows a consistent upward trend with 23% month-over-month growth.',
-          confidence: 92,
-          icon: TrendingUp,
-          color: 'text-emerald-600',
-          bgColor: 'bg-emerald-100'
-        },
-        {
-          type: 'anomaly',
-          title: 'Data Quality Issue',
-          description: 'Detected 15 outlier values in the revenue column that may require attention.',
-          confidence: 87,
-          icon: AlertCircle,
-          color: 'text-amber-600',
-          bgColor: 'bg-amber-100'
-        },
-        {
-          type: 'recommendation',
-          title: 'Optimization Opportunity',
-          description: 'Consider normalizing date formats for improved data consistency across columns.',
-          confidence: 78,
-          icon: Lightbulb,
-          color: 'text-blue-600',
-          bgColor: 'bg-blue-100'
-        }
-      ];
+    try {
+      const response = await fetch(API_ENDPOINTS.GENERATE_INSIGHTS, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ datasetId: activeDataset._id }),
+      });
 
-      setInsights(mockInsights);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch insights from the server.');
+      }
+
+      const result = await response.json();
+      setInsight(result.insight);
+
+    } catch (error) {
+      console.error("Error generating insights:", error);
+      setInsight("Sorry, an error occurred while generating the insight. Please check the server connection and ensure your API key is valid.");
+    } finally {
       setIsGenerating(false);
-    }, 3000);
+    }
   };
 
   if (!activeDataset) {
@@ -68,6 +54,7 @@ export const AIInsights: React.FC = () => {
 
   return (
     <div className="space-y-8">
+      {/* Header and Generate Button */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">AI Insights</h1>
@@ -75,12 +62,7 @@ export const AIInsights: React.FC = () => {
             AI-powered analysis and recommendations for: {activeDataset.name}
           </p>
         </div>
-        
-        <Button
-          onClick={generateInsights}
-          disabled={isGenerating}
-          variant="primary"
-        >
+        <Button onClick={generateInsights} disabled={isGenerating} variant="primary">
           {isGenerating ? (
             <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
           ) : (
@@ -90,69 +72,46 @@ export const AIInsights: React.FC = () => {
         </Button>
       </div>
 
-      {/* AI Status */}
+      {/* AI Status Card */}
       <Card title="AI Analysis Status">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Brain className="h-8 w-8 text-purple-600 mr-3" />
             <div>
-              <h3 className="font-semibold text-gray-900">AI Analysis Engine</h3>
+              <h3 className="font-semibold text-gray-900">Groq AI Analysis Engine</h3>
               <p className="text-gray-600">
-                {isGenerating ? 'Processing your data...' : 'Ready to analyze your dataset'}
+                {isGenerating ? 'Analyzing your data via Groq...' : 'Ready to analyze your dataset'}
               </p>
             </div>
           </div>
           <div className={`px-3 py-1 rounded-full text-xs font-medium ${
             isGenerating 
               ? 'bg-amber-100 text-amber-800' 
-              : insights.length > 0 
-                ? 'bg-emerald-100 text-emerald-800'
-                : 'bg-gray-100 text-gray-800'
+              : insight
+              ? 'bg-emerald-100 text-emerald-800'
+              : 'bg-gray-100 text-gray-800'
           }`}>
-            {isGenerating ? 'Processing' : insights.length > 0 ? 'Completed' : 'Idle'}
+            {isGenerating ? 'Processing' : insight ? 'Completed' : 'Idle'}
           </div>
         </div>
       </Card>
 
-      {/* Generated Insights */}
-      {insights.length > 0 && (
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-gray-900">Generated Insights</h2>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {insights.map((insight, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <div className="flex items-start">
-                  <div className={`${insight.bgColor} ${insight.color} p-3 rounded-lg mr-4`}>
-                    <insight.icon className="h-6 w-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-2">{insight.title}</h3>
-                    <p className="text-gray-700 mb-3">{insight.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                        {insight.type}
-                      </span>
-                      <div className="flex items-center">
-                        <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                          <div 
-                            className="bg-blue-500 h-2 rounded-full" 
-                            style={{ width: `${insight.confidence}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-sm text-gray-600">{insight.confidence}%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
+      {/* Display Generated Insight */}
+      {insight && !isGenerating && (
+        <Card title="Generated Insight" className="bg-blue-50 border-blue-200">
+           <div className="flex items-start">
+             <div className="bg-blue-100 text-blue-600 p-3 rounded-lg mr-4">
+               <Lightbulb className="h-6 w-6" />
+             </div>
+             <div className="flex-1">
+               <p className="text-gray-800 whitespace-pre-wrap">{insight}</p>
+             </div>
+           </div>
+        </Card>
       )}
-
-      {/* Placeholder when no insights */}
-      {insights.length === 0 && !isGenerating && (
+      
+      {/* Placeholder when no insights are generated yet */}
+      {!insight && !isGenerating && (
         <Card>
           <div className="text-center py-12">
             <Brain className="h-16 w-16 mx-auto text-gray-300 mb-4" />
@@ -180,7 +139,6 @@ export const AIInsights: React.FC = () => {
               Identify patterns, growth trends, and seasonal variations in your data.
             </p>
           </div>
-          
           <div className="text-center">
             <div className="bg-amber-100 text-amber-600 p-4 rounded-lg mb-4 inline-block">
               <AlertCircle className="h-8 w-8" />
@@ -190,7 +148,6 @@ export const AIInsights: React.FC = () => {
               Spot outliers, inconsistencies, and data quality issues automatically.
             </p>
           </div>
-          
           <div className="text-center">
             <div className="bg-blue-100 text-blue-600 p-4 rounded-lg mb-4 inline-block">
               <Lightbulb className="h-8 w-8" />

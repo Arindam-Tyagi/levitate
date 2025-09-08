@@ -42,7 +42,7 @@ export const generateInsightWithGroq = async (datasetId) => {
           content: prompt,
         },
       ],
-      model: 'llama3-8b-8192', // A fast and capable model
+      model: 'meta-llama/llama-guard-4-12b', // A fast and capable model
       temperature: 0.7,
       max_tokens: 250,
     });
