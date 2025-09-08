@@ -1,11 +1,14 @@
+// levitate-backend/routes/uploadRoutes.js
+
 import express from 'express';
 import multer from 'multer';
-// Corrected path
 import { uploadFile } from '../controllers/uploadController.js';
+import { protect } from '../middleware/authMiddleware.js'; // Import protect
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
 
-router.post('/', upload.single('file'), uploadFile);
+// Add the 'protect' middleware before the controller function
+router.post('/', protect, upload.single('file'), uploadFile);
 
 export default router;

@@ -8,22 +8,33 @@ import { DataMerging } from './pages/DataMerging';
 import { AIInsights } from './pages/AIInsights';
 import { Charts } from './pages/Charts';
 import { Export } from './pages/Export';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { AuthProvider } from './hooks/useAuth';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="upload" element={<Upload />} />
-          <Route path="cleaning" element={<DataCleaning />} />
-          <Route path="merging" element={<DataMerging />} />
-          <Route path="insights" element={<AIInsights />} />
-          <Route path="charts" element={<Charts />} />
-          <Route path="export" element={<Export />} />
-        </Route>
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="upload" element={<Upload />} />
+              <Route path="cleaning" element={<DataCleaning />} />
+              <Route path="merging" element={<DataMerging />} />
+              <Route path="insights" element={<AIInsights />} />
+              <Route path="charts" element={<Charts />} />
+              <Route path="export" element={<Export />} />
+            </Route>
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

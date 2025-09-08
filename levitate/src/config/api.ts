@@ -2,6 +2,13 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:2707';
 
 export const API_ENDPOINTS = {
+  
+  // Auth endpoints
+   REGISTER: `${API_BASE_URL}/api/auth/register`,
+  LOGIN: `${API_BASE_URL}/api/auth/login`,
+  LOGOUT: `${API_BASE_URL}/api/auth/logout`,
+  GET_ME: `${API_BASE_URL}/api/auth/me`,
+
   // Dataset endpoints
   DATASETS: `${API_BASE_URL}/api/datasets`,
   

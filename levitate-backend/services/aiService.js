@@ -24,14 +24,16 @@ export const generateInsightWithGroq = async (datasetId) => {
   const dataPreview = JSON.stringify(dataset.dataPreview);
 
   const prompt = `
-    As a senior data analyst, analyze the following dataset preview and provide a concise, actionable insight.
-    The dataset is named "${dataset.name}" and has the following columns: ${dataset.columns.join(', ')}.
-    
-    Here is a preview of the first few rows (in JSON format):
+   As a senior data analyst, analyze the following dataset preview and provide three concise, actionable insights in a bulleted list.
+    The dataset is named "${dataset.name}" and has these columns: ${dataset.columns.join(', ')}.
+
+    Here is a preview of the first 10 rows (in JSON format):
     ${dataPreview}
 
-    Based on this data, identify one significant trend, anomaly, or data quality issue. 
-    Keep your response to a single paragraph. Start your response with "Insight:"
+    Based on this data, identify at least three significant trends, anomalies, or data quality issues.
+    - Start each point with a bullet character (* or -).
+    - Each point should be a single, complete sentence.
+    - Do not add any introductory text or a title.
   `;
 
   try {
@@ -42,7 +44,7 @@ export const generateInsightWithGroq = async (datasetId) => {
           content: prompt,
         },
       ],
-      model: 'meta-llama/llama-guard-4-12b', // A fast and capable model
+      model: 'llama-3.1-8b-instant', // A fast and capable model
       temperature: 0.7,
       max_tokens: 250,
     });

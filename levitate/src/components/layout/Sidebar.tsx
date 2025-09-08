@@ -1,5 +1,8 @@
+// levitate/src/components/layout/Sidebar.tsx
+
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 import { 
   LayoutDashboard, 
   Upload, 
@@ -7,7 +10,9 @@ import {
   Merge, 
   Brain, 
   Download,
-  BarChart3
+  BarChart3,
+  LogOut,
+  User,
 } from 'lucide-react';
 
 const navigation = [
@@ -21,6 +26,14 @@ const navigation = [
 ];
 
 export const Sidebar: React.FC = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
   return (
     <div className="flex h-full w-64 flex-col bg-gradient-to-b from-slate-900 to-slate-800 shadow-xl">
       <div className="flex items-center px-6 py-8">
@@ -57,12 +70,25 @@ export const Sidebar: React.FC = () => {
         </ul>
       </nav>
       
-      <div className="p-4">
-        <div className="rounded-lg bg-slate-800 p-4">
-          <p className="text-xs text-slate-400 text-center">
-            Levitate v1.0.0
-          </p>
-        </div>
+      <div className="p-4 mt-auto border-t border-slate-700">
+        {user && (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3 px-2">
+              <User className="h-6 w-6 text-slate-400" />
+              <div>
+                <p className="font-semibold text-white">{user.name}</p>
+                <p className="text-xs text-slate-400">{user.email}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 bg-red-600/20 text-red-400 hover:bg-red-600/40 hover:text-red-300"
+            >
+              <LogOut className="mr-2 h-5 w-5" />
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
