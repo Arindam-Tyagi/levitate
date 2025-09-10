@@ -3,7 +3,6 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 
-// Helper function (generateToken) remains the same...
 const generateToken = (res, userId) => {
   const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
     expiresIn: '30d',
@@ -17,11 +16,14 @@ const generateToken = (res, userId) => {
   });
 };
 
-// registerUser function remains the same...
 export const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
+    if (!name || !email || !password) {
+        return res.status(400).json({ message: 'Please provide all fields' });
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
@@ -41,21 +43,16 @@ export const registerUser = async (req, res) => {
       res.status(400).json({ message: 'Invalid user data' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Register Error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-
-// @desc    Auth user & get token
-// @route   POST /api/auth/login
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // --- THIS IS THE FIX ---
-    // You must add .select('+password') to retrieve the password field
     const user = await User.findOne({ email }).select('+password');
-    // ---------------------
 
     if (user && (await user.matchPassword(password))) {
       generateToken(res, user._id);
@@ -69,11 +66,11 @@ export const loginUser = async (req, res) => {
       res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Login Error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// logoutUser and getMe functions remain the same...
 export const logoutUser = (req, res) => {
   res.cookie('token', '', {
     httpOnly: true,
