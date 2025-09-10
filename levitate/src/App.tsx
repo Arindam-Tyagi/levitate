@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { Upload } from './pages/Upload';
+import { ConnectDatabase } from './pages/ConnectDatabase'; // 1. Import the new page
 import { DataCleaning } from './pages/DataCleaning';
 import { DataMerging } from './pages/DataMerging';
 import { AIInsights } from './pages/AIInsights';
@@ -25,6 +26,7 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Dashboard />} />
               <Route path="upload" element={<Upload />} />
+              <Route path="connect-db" element={<ConnectDatabase />} /> {/* 2. Add the route */}
               <Route path="cleaning" element={<DataCleaning />} />
               <Route path="merging" element={<DataMerging />} />
               <Route path="insights" element={<AIInsights />} />

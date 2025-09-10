@@ -11,13 +11,14 @@ import {
   Brain, 
   Download,
   BarChart3,
-  LogOut,
+  LogIn, // Changed from LogOut
   User,
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Upload Data', href: '/upload', icon: Upload },
+  { name: 'Connect to DB', href: '/connect-db', icon: Database }, // Add this line
   { name: 'Data Cleaning', href: '/cleaning', icon: Database },
   { name: 'Data Merging', href: '/merging', icon: Merge },
   { name: 'AI Insights', href: '/insights', icon: Brain },
