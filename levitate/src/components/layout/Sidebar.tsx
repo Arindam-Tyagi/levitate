@@ -11,7 +11,7 @@ import {
   Brain, 
   Download,
   BarChart3,
-  LogIn, // Changed from LogOut
+  LogOut, // Changed from LogOut
   User,
 } from 'lucide-react';
 

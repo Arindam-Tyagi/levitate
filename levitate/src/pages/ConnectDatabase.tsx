@@ -1,3 +1,5 @@
+// levitate/src/pages/ConnectDatabase.tsx
+
 import React, { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -37,6 +39,7 @@ export const ConnectDatabase: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(credentials),
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -47,7 +50,7 @@ export const ConnectDatabase: React.FC = () => {
       const result = await response.json();
       const newDataset: Dataset = result.dataset;
       addDataset(newDataset);
-      // Optionally, navigate to the dashboard or show a success message
+      // You can add a success message or navigation here
       
     } catch (err: any) {
       setError(err.message);
@@ -67,7 +70,6 @@ export const ConnectDatabase: React.FC = () => {
 
       <Card title="Database Credentials" subtitle="Enter your database connection details below">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Form fields for database credentials */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Database Type</label>
             <select name="dbType" value={credentials.dbType} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
@@ -77,8 +79,6 @@ export const ConnectDatabase: React.FC = () => {
             </select>
           </div>
 
-          {/* Other input fields for host, port, user, etc. */}
-          {/* ... (You can add more fields as needed) ... */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Host</label>
             <input type="text" name="host" value={credentials.host} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"/>

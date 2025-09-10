@@ -19,6 +19,7 @@ export const Upload: React.FC = () => {
        const response = await fetch(API_ENDPOINTS.UPLOAD, { // 3. Use the correct endpoint{
         method: 'POST',
         body: formData,
+        credentials: 'include',
       });
 
       if (!response.ok) {
