@@ -27,7 +27,7 @@ export const ConnectDatabase: React.FC = () => {
     setCredentials(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+ const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsConnecting(true);
     setError(null);
@@ -39,7 +39,7 @@ export const ConnectDatabase: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(credentials),
-        credentials: 'include',
+        credentials: 'include', // <-- ADD THIS LINE
       });
 
       if (!response.ok) {
@@ -50,7 +50,6 @@ export const ConnectDatabase: React.FC = () => {
       const result = await response.json();
       const newDataset: Dataset = result.dataset;
       addDataset(newDataset);
-      // You can add a success message or navigation here
       
     } catch (err: any) {
       setError(err.message);

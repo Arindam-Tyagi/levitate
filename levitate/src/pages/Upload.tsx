@@ -15,11 +15,10 @@ export const Upload: React.FC = () => {
     formData.append('file', file);
 
     try {
-      // In a real app, you would show a loading indicator here
-       const response = await fetch(API_ENDPOINTS.UPLOAD, { // 3. Use the correct endpoint{
+      const response = await fetch(API_ENDPOINTS.UPLOAD, {
         method: 'POST',
         body: formData,
-        credentials: 'include',
+        credentials: 'include', // <-- ADD THIS LINE
       });
 
       if (!response.ok) {
@@ -31,11 +30,9 @@ export const Upload: React.FC = () => {
       const newDataset: Dataset = result.dataset;
       
       addDataset(newDataset);
-      // You could also show a success notification here
 
     } catch (error) {
       console.error('Error uploading file:', error);
-      // And an error notification to the user here
     }
   };
 

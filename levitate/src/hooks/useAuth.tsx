@@ -1,92 +1,98 @@
-// levitate/src/hooks/useAuth.tsx
-
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { apiRequest } from '../config/api';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { Dataset } from '../types';
 import { API_ENDPOINTS } from '../config/api';
 
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  roles: string[];
-}
-
 interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  login: (data: any) => Promise<void>;
-  register: (data: any) => Promise<void>;
+  user: Dataset | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<Dataset | null>(() => {
+    try {
+      const storedUser = localStorage.getItem('levitate-user');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      console.error("Failed to parse user from localStorage", error);
+      return null;
+    }
+  });
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkUserLoggedIn = async () => {
-      try {
-        const response = await apiRequest(API_ENDPOINTS.GET_ME, {
-            credentials: 'include',
-        });
-        if (response.ok) {
-            const data = await response.json();
-            setUser(data);
-        } else {
-            setUser(null)
-        }
-      } catch (error) {
-        setUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    checkUserLoggedIn();
+    // Could also check token validity with backend here
+    setLoading(false);
   }, []);
 
-  const login = async (credentials: any) => {
+  const login = async (email: string, password: string) => {
     try {
-      const response = await apiRequest(API_ENDPOINTS.LOGIN, {
+      const response = await fetch(API_ENDPOINTS.LOGIN, {
         method: 'POST',
-        body: JSON.stringify(credentials),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
         credentials: 'include',
       });
-      const data = await response.json();
-      setUser(data);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Login failed');
+      }
+
+      const userData = await response.json();
+      setUser(userData);
+      localStorage.setItem('levitate-user', JSON.stringify(userData));
     } catch (error) {
-      console.error("Login failed:", error);
-      throw error; // Re-throw the error to be caught in the component
+      console.error("Login error:", error);
+      throw error;
     }
   };
 
-  const register = async (credentials: any) => {
+  const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await apiRequest(API_ENDPOINTS.REGISTER, {
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: 'POST',
-        body: JSON.stringify(credentials),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
         credentials: 'include',
       });
-      const data = await response.json();
-      setUser(data);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Registration failed');
+      }
+
+      const userData = await response.json();
+      setUser(userData);
+      localStorage.setItem('levitate-user', JSON.stringify(userData));
     } catch (error) {
-        console.error("Registration failed:", error);
-        throw error; // Re-throw the error
+      console.error("Registration error:", error);
+      throw error;
     }
   };
 
   const logout = async () => {
-    await apiRequest(API_ENDPOINTS.LOGOUT, { 
-      method: 'POST',
-      credentials: 'include',
-    });
-    setUser(null);
+    try {
+      await fetch(API_ENDPOINTS.LOGOUT, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setUser(null);
+      localStorage.removeItem('levitate-user');
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
-      {children}
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
