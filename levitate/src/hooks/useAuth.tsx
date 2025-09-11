@@ -30,51 +30,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
-    try {
-      const response = await fetch(API_ENDPOINTS.LOGIN, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include',
-      });
+  // Corrected code for useAuth.tsx
+const login = async (credentials: any) => {
+  try {
+    const response = await fetch(API_ENDPOINTS.LOGIN, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials),
+      credentials: 'include',
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Login failed');
-      }
-
-      const userData = await response.json();
-      setUser(userData);
-      localStorage.setItem('levitate-user', JSON.stringify(userData));
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Login failed');
     }
-  };
 
-  const register = async (name: string, email: string, password: string) => {
-    try {
-      const response = await fetch(API_ENDPOINTS.REGISTER, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
-        credentials: 'include',
-      });
+    const userData = await response.json();
+    setUser(userData);
+    localStorage.setItem('levitate-user', JSON.stringify(userData));
+  } catch (error) {
+    console.error("Login error:", error);
+    throw error;
+  }
+};
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Registration failed');
-      }
+const register = async (credentials: any) => {
+  try {
+    const response = await fetch(API_ENDPOINTS.REGISTER, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials),
+      credentials: 'include',
+    });
 
-      const userData = await response.json();
-      setUser(userData);
-      localStorage.setItem('levitate-user', JSON.stringify(userData));
-    } catch (error) {
-      console.error("Registration error:", error);
-      throw error;
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Registration failed');
     }
-  };
+
+    const userData = await response.json();
+    setUser(userData);
+    localStorage.setItem('levitate-user', JSON.stringify(userData));
+  } catch (error) {
+    console.error("Registration error:", error);
+    throw error;
+  }
+};
 
   const logout = async () => {
     try {
