@@ -10,7 +10,11 @@ export const useDatasets = () => {
   useEffect(() => {
     const fetchInitialDatasets = async () => {
       try {
-        const response = await fetch(API_ENDPOINTS.DATASETS);
+        // Add credentials: 'include' to send the auth cookie
+        const response = await fetch(API_ENDPOINTS.DATASETS, {
+          credentials: 'include',
+        });
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

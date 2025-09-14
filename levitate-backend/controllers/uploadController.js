@@ -1,4 +1,3 @@
-// Corrected path
 import { processAndSaveFile } from '../services/fileService.js';
 
 export const uploadFile = async (req, res) => {
@@ -6,7 +5,8 @@ export const uploadFile = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded.' });
     }
-    const dataset = await processAndSaveFile(req.file);
+    // Pass the user ID from req.user (added by the 'protect' middleware)
+    const dataset = await processAndSaveFile(req.file, req.user._id); 
     res.status(201).json({
       message: 'File uploaded successfully!',
       dataset,
