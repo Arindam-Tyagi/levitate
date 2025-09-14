@@ -1,3 +1,5 @@
+// levitate-backend/services/aiService.js
+
 import Groq from 'groq-sdk';
 import Dataset from '../models/Dataset.js';
 
@@ -5,11 +7,6 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-/**
- * Generates insights for a given dataset using the Groq API.
- * @param {string} datasetId The ID of the dataset to analyze.
- * @returns {Promise<string>} The generated insight as a string.
- */
 export const generateInsightWithGroq = async (datasetId) => {
   if (!datasetId) {
     throw new Error('Dataset ID is required.');
@@ -20,8 +17,8 @@ export const generateInsightWithGroq = async (datasetId) => {
     throw new Error('Dataset not found.');
   }
 
-  // Use a stringified preview of the data to send to the AI
-  const dataPreview = JSON.stringify(dataset.dataPreview);
+  // Slice the data preview to the first 10 rows before stringifying
+  const dataPreview = JSON.stringify(dataset.dataPreview.slice(0, 10));
 
   const prompt = `
    As a senior data analyst, analyze the following dataset preview and provide three concise, actionable insights in a bulleted list.
@@ -44,7 +41,7 @@ export const generateInsightWithGroq = async (datasetId) => {
           content: prompt,
         },
       ],
-      model: 'llama-3.1-8b-instant', // A fast and capable model
+      model: 'llama-3.1-8b-instant',
       temperature: 0.7,
       max_tokens: 250,
     });

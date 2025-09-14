@@ -117,3 +117,39 @@ export const downloadFile = (content: string, filename: string, type: string = '
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
 };
+
+export const generateChartData = (dataset: Dataset | null) => {
+    if (!dataset) return [];
+
+    const dateColumn = dataset.columns.find(col => col.toLowerCase().includes('date'));
+    const revenueColumn = dataset.columns.find(col => col.toLowerCase().includes('revenue'));
+    const customerColumn = dataset.columns.find(col => col.toLowerCase().includes('customer'));
+
+    if (!dateColumn || !revenueColumn || !customerColumn) return [];
+
+    const monthlyData = dataset.dataPreview.reduce((acc, row) => {
+        try {
+            const date = new Date(row[dateColumn]);
+            const month = date.toLocaleString('default', { month: 'short' });
+            const year = date.getFullYear();
+            const key = `${year}-${month}`;
+
+            if (!acc[key]) {
+                acc[key] = { month, revenue: 0, customers: new Set() };
+            }
+
+            acc[key].revenue += parseFloat(row[revenueColumn]) || 0;
+            acc[key].customers.add(row[customerColumn]);
+
+            return acc;
+        } catch (error) {
+            return acc;
+        }
+    }, {} as Record<string, { month: string; revenue: number; customers: Set<any> }>);
+
+    return Object.values(monthlyData).map(d => ({
+        month: d.month,
+        revenue: d.revenue,
+        customers: d.customers.size
+    }));
+};

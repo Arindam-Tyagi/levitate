@@ -1,3 +1,5 @@
+// levitate/vite.config.ts
+
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -10,7 +12,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:2707',
+        target: 'http://localhost:5001', // Corrected Port
         changeOrigin: true,
         secure: false,
       },

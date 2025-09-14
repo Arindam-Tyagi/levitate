@@ -3,13 +3,13 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Card } from '../components/ui/Card';
 import { useDatasets } from '../hooks/useDatasets';
 import { analyzeDataset } from '../utils/dataProcessing';
-import { generateChartData } from '../data/sampleData';
+import { generateDynamicChartData } from '../utils/chartUtils';
 import { Database, FileText, AlertCircle, TrendingUp } from 'lucide-react';
 import { ApiTest } from '../components/common/ApiTest';
 
 export const Dashboard: React.FC = () => {
   const { datasets, activeDataset } = useDatasets();
-  const chartData = generateChartData();
+  const { chartData, numericCol, categoricalCol, error: chartError } = generateDynamicChartData(activeDataset);
   
   const stats = activeDataset ? analyzeDataset(activeDataset) : null;
 
@@ -37,7 +37,7 @@ export const Dashboard: React.FC = () => {
     },
     {
       title: 'Data Quality',
-      value: `${stats ? Math.round(((stats.rowCount - stats.missingValues) / stats.rowCount) * 100) : 0}%`,
+      value: `${stats && stats.rowCount > 0 ? Math.round(((stats.rowCount * stats.columnCount - stats.missingValues) / (stats.rowCount * stats.columnCount)) * 100) : 0}%`,
       icon: TrendingUp,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100'
@@ -73,63 +73,76 @@ export const Dashboard: React.FC = () => {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card title="Monthly Revenue Trend" subtitle="Last 6 months performance">
+        <Card title={numericCol ? `Monthly ${numericCol} Trend` : 'Monthly Trend'} subtitle="Performance over time">
           <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" stroke="#666" />
-                <YAxis stroke="#666" />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="url(#colorGradient)" 
-                  strokeWidth={3}
-                  dot={{ fill: '#3B82F6', strokeWidth: 2, r: 5 }}
-                />
-                <defs>
-                  <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#3B82F6" />
-                    <stop offset="100%" stopColor="#6366F1" />
-                  </linearGradient>
-                </defs>
-              </LineChart>
-            </ResponsiveContainer>
+            {numericCol && !chartError ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="month" stroke="#666" />
+                  <YAxis stroke="#666" />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="value" 
+                    name={numericCol}
+                    stroke="url(#colorGradient)" 
+                    strokeWidth={3}
+                    dot={{ fill: '#3B82F6', strokeWidth: 2, r: 5 }}
+                  />
+                  <defs>
+                    <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#3B82F6" />
+                      <stop offset="100%" stopColor="#6366F1" />
+                    </linearGradient>
+                  </defs>
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                <p>{chartError || "No numeric data found to plot a trend."}</p>
+              </div>
+            )}
           </div>
         </Card>
 
-        <Card title="Customer Growth" subtitle="Monthly customer acquisition">
+        <Card title={categoricalCol ? `${categoricalCol} Growth` : 'Monthly Count'} subtitle="Monthly acquisition/count">
           <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" stroke="#666" />
-                <YAxis stroke="#666" />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Bar dataKey="customers" fill="url(#barGradient)" radius={[4, 4, 0, 0]} />
-                <defs>
-                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10B981" />
-                    <stop offset="100%" stopColor="#059669" />
-                  </linearGradient>
-                </defs>
-              </BarChart>
-            </ResponsiveContainer>
+            {categoricalCol && !chartError ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="month" stroke="#666" />
+                  <YAxis stroke="#666" />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                  <Bar dataKey="count" name={`Unique ${categoricalCol}s`} fill="url(#barGradient)" radius={[4, 4, 0, 0]} />
+                  <defs>
+                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10B981" />
+                      <stop offset="100%" stopColor="#059669" />
+                    </linearGradient>
+                  </defs>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                <p>{chartError || "No categorical data found for counting."}</p>
+              </div>
+            )}
           </div>
         </Card>
       </div>
