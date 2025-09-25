@@ -1,4 +1,4 @@
-import { generateInsightWithGroq } from '../services/aiService.js';
+import { generateInsightWithOllama } from '../services/aiService.js';
 
 export const generateInsights = async (req, res) => {
   try {
@@ -6,7 +6,7 @@ export const generateInsights = async (req, res) => {
     if (!datasetId) {
       return res.status(400).json({ message: 'A datasetId is required.' });
     }
-    const insight = await generateInsightWithGroq(datasetId);
+    const insight = await generateInsightWithOllama(datasetId);
     res.status(200).json({ insight });
   } catch (error) {
     console.error('Error in AI controller:', error);

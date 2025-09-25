@@ -10,6 +10,7 @@ import uploadRoutes from './routes/uploadRoutes.js';
 import dbRoutes from './routes/dbRoutes.js';
 import datasetRoutes from './routes/datasetRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import deduplicationRoutes from './routes/deduplicationRoutes.js';
 
 dotenv.config();
 connectDB();
@@ -39,7 +40,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/connect', dbRoutes);
 app.use('/api/datasets', datasetRoutes);
 app.use('/api/ai', aiRoutes);
-
+app.use('/api/deduplication', deduplicationRoutes);
 
 app.get('/', (req, res) => {
   res.send('Levitate Backend API is running...');

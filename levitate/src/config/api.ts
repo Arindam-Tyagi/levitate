@@ -20,6 +20,10 @@ export const API_ENDPOINTS = {
   // Note: The backend route is '/api/connect/db', not '/api/db'
   DB_CONNECT: `${API_BASE_URL}/connect/db`,
   GENERATE_INSIGHTS: `${API_BASE_URL}/ai/generate-insights`,
+
+  // Deduplication endpoints
+  DEDUPLICATION_FIND: `${API_BASE_URL}/deduplication/find`,
+  DEDUPLICATION_MERGE: `${API_BASE_URL}/deduplication/merge`,
 };
 
 // Default headers for API requests

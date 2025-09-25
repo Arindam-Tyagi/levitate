@@ -1,0 +1,19 @@
+{
+	"servers": {
+		"my-mcp-server-600dc0c1": {
+			"type": "stdio",
+			"command": "Enter",
+			"args": []
+		},
+		"my-mcp-server-4addfeba": {
+			"type": "stdio",
+			"command": "npm",
+			"args": [
+				"run",
+				"browsermcp",
+				"@latest"
+			]
+		}
+	},
+	"inputs": []
+}

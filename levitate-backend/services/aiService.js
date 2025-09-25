@@ -1,13 +1,9 @@
 // levitate-backend/services/aiService.js
 
-import Groq from 'groq-sdk';
+import ollama from 'ollama';
 import Dataset from '../models/Dataset.js';
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
-
-export const generateInsightWithGroq = async (datasetId) => {
+export const generateInsightWithOllama = async (datasetId) => {
   if (!datasetId) {
     throw new Error('Dataset ID is required.');
   }
@@ -34,21 +30,14 @@ export const generateInsightWithGroq = async (datasetId) => {
   `;
 
   try {
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      model: 'llama-3.1-8b-instant',
-      temperature: 0.7,
-      max_tokens: 250,
+    const response = await ollama.chat({
+      model: 'qwen',
+      messages: [{ role: 'user', content: prompt }],
     });
 
-    return chatCompletion.choices[0]?.message?.content || 'No insight could be generated.';
+    return response.message.content || 'No insight could be generated.';
   } catch (error) {
-    console.error('Error calling Groq API:', error);
-    throw new Error('Failed to generate insights from Groq API.');
+    console.error('Error calling Ollama:', error);
+    throw new Error('Failed to generate insights from Ollama.');
   }
 };

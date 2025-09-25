@@ -15,7 +15,7 @@ export const AIInsights: React.FC = () => {
 
     setIsGenerating(true);
     setInsight(null); // Clear previous insight
-    
+
     try {
       const response = await fetch(API_ENDPOINTS.GENERATE_INSIGHTS, {
         method: 'POST',
@@ -78,15 +78,15 @@ export const AIInsights: React.FC = () => {
           <div className="flex items-center">
             <Brain className="h-8 w-8 text-purple-600 mr-3" />
             <div>
-              <h3 className="font-semibold text-gray-900">Groq AI Analysis Engine</h3>
+              <h3 className="font-semibold text-gray-900">Ollama (qwen model)</h3>
               <p className="text-gray-600">
-                {isGenerating ? 'Analyzing your data via Groq...' : 'Ready to analyze your dataset'}
+                {isGenerating ? 'Analyzing your data via Ollama...' : 'Ready to analyze your dataset'}
               </p>
             </div>
           </div>
           <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-            isGenerating 
-              ? 'bg-amber-100 text-amber-800' 
+            isGenerating
+              ? 'bg-amber-100 text-amber-800'
               : insight
               ? 'bg-emerald-100 text-emerald-800'
               : 'bg-gray-100 text-gray-800'
@@ -109,7 +109,7 @@ export const AIInsights: React.FC = () => {
            </div>
         </Card>
       )}
-      
+
       {/* Placeholder when no insights are generated yet */}
       {!insight && !isGenerating && (
         <Card>
